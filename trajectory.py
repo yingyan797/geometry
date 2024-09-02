@@ -1,34 +1,62 @@
 from PIL import Image
+from util import line_connect
 import numpy as np
 import matplotlib.pyplot as plt
 import os, copy
 
-def line_connect(imarr: np.ndarray, p1, p2, w=0):
-    # print(imarr.shape, p1, p2)
-    if p1[0] == p2[0]:
-        imarr[min(p1[1], p2[1]):max(p1[1], p2[1]),p1[0]-w:p1[0]+w+1] = 0
-    elif p1[1] == p2[1]:
-        imarr[p2[1]-w:p2[1]+w+1, min(p1[0], p2[0]):min(p1[0], p2[0])] = 0
-    else:
-        rat = (p2[1]-p1[1])/(p2[0]-p1[0])
-        d = 1
-        if abs(rat) > 1:
-            c = p1[0]
-            if p2[1] < p1[1]:
-                d = -1
-            for r in range(p1[1],p2[1], d):
-                imarr[r-w:r+w+1,int(c)-w:int(c)+w+1] = 0
-                c += d/rat
+class Animation:
+    def __init__(self, dtype, acc=False):
+        self.dtype = dtype
+        self.acc = acc
+        self.base:np.ndarray = None
+        self.canvas:np.ndarray = None
+        self.frames = []
+
+    def base_edit(self):
+        self.canvas = self.base
+
+    def base_save(self):
+        self.base = copy.deepcopy(self.canvas)
+
+    def draw_rect(self, r, c, w, h=None, color=0):
+        if h is None:
+            h = w
+        self.canvas[r-h:r+h+1, c-w:c+w+1] = color
+
+    def draw_circle(self, r, c, radius, color=0):
+        for i in range(r-radius, r+radius+1):
+            for j in range(c-radius, c+radius+1):
+                if np.power(i-r, 2)+np.power(j-c, 2) <= radius*radius:
+                    self.canvas[r][c] = color
+
+    def line_connect(self, p1, p2, color=0, w=0):
+        # print(imarr.shape, p1, p2)
+        if p1[0] == p2[0]:
+            self.canvas[min(p1[1], p2[1]):max(p1[1], p2[1]),p1[0]-w:p1[0]+w+1] = 0
+        elif p1[1] == p2[1]:
+            self.canvas[p2[1]-w:p2[1]+w+1, min(p1[0], p2[0]):min(p1[0], p2[0])] = 0
         else:
-            r = p1[1]
-            if p2[0] < p1[0]:
-                d = -1
-            for c in range(p1[0], p2[0], d):
-                imarr[int(r)-w:int(r)+w+1,c-w:c+w+1] = 0
-                r += d*rat
+            rat = (p2[1]-p1[1])/(p2[0]-p1[0])
+            d = 1
+            if abs(rat) > 1:
+                c = p1[0]
+                if p2[1] < p1[1]:
+                    d = -1
+                for r in range(p1[1],p2[1], d):
+                    self.draw_rect(r, int(c), w, color=color)
+                    c += d/rat
+            else:
+                r = p1[1]
+                if p2[0] < p1[0]:
+                    d = -1
+                for c in range(p1[0], p2[0], d):
+                    self.draw_rect(int(r), c, w, color=color)
+                    self.canvas[int(r)-w:int(r)+w+1,c-w:c+w+1] = 0
+                    r += d*rat
 
 class RodSlide:
-    def __init__(self, r=100, l=200, dx=1) -> None:
+    def __init__(self, ani:Animation, r=100, l=200, dx=1) -> None:
+        self.ani = ani
         self.r = r
         self.l = l
         self.dx = dx
