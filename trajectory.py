@@ -1,65 +1,17 @@
-from PIL import Image
-from util import line_connect
+from painter import Animation, copy
+from util import sveqsolve
 import numpy as np
 import matplotlib.pyplot as plt
-import os, copy
-
-class Animation:
-    def __init__(self, dtype, acc=False):
-        self.dtype = dtype
-        self.acc = acc
-        self.base:np.ndarray = None
-        self.canvas:np.ndarray = None
-        self.frames = []
-
-    def base_edit(self):
-        self.canvas = self.base
-
-    def base_save(self):
-        self.base = copy.deepcopy(self.canvas)
-
-    def draw_rect(self, r, c, w, h=None, color=0):
-        if h is None:
-            h = w
-        self.canvas[r-h:r+h+1, c-w:c+w+1] = color
-
-    def draw_circle(self, r, c, radius, color=0):
-        for i in range(r-radius, r+radius+1):
-            for j in range(c-radius, c+radius+1):
-                if np.power(i-r, 2)+np.power(j-c, 2) <= radius*radius:
-                    self.canvas[r][c] = color
-
-    def line_connect(self, p1, p2, color=0, w=0):
-        # print(imarr.shape, p1, p2)
-        if p1[0] == p2[0]:
-            self.canvas[min(p1[1], p2[1]):max(p1[1], p2[1]),p1[0]-w:p1[0]+w+1] = 0
-        elif p1[1] == p2[1]:
-            self.canvas[p2[1]-w:p2[1]+w+1, min(p1[0], p2[0]):min(p1[0], p2[0])] = 0
-        else:
-            rat = (p2[1]-p1[1])/(p2[0]-p1[0])
-            d = 1
-            if abs(rat) > 1:
-                c = p1[0]
-                if p2[1] < p1[1]:
-                    d = -1
-                for r in range(p1[1],p2[1], d):
-                    self.draw_rect(r, int(c), w, color=color)
-                    c += d/rat
-            else:
-                r = p1[1]
-                if p2[0] < p1[0]:
-                    d = -1
-                for c in range(p1[0], p2[0], d):
-                    self.draw_rect(int(r), c, w, color=color)
-                    self.canvas[int(r)-w:int(r)+w+1,c-w:c+w+1] = 0
-                    r += d*rat
+import os
 
 class RodSlide:
-    def __init__(self, ani:Animation, r=100, l=200, dx=1) -> None:
+    def __init__(self, ani:Animation, traj=True, sweep=True, r=100, l=200, dx=1) -> None:
+        self.traj, self.sweep = traj, sweep
         self.ani = ani
         self.r = r
         self.l = l
         self.dx = dx
+        self.template = None
     def reset(self):
         self.traj, self.l1, self.l2 = [], [], []
     def block(self, s, i):
@@ -71,6 +23,8 @@ class RodSlide:
             if not isinstance(self.l2[i], np.ndarray):
                 return [0, self.l2[i]]
             return self.l2[i]
+    def corners(self, dtype):
+        pass
     def position(self, lx, ly):
         dx = (ly[0]-lx[0])/self.r*self.l
         dy = (ly[1]-lx[1])/self.r*self.l
@@ -81,30 +35,29 @@ class RodSlide:
         self.traj = np.array(self.traj, dtype=np.int16)
         self.l1 = np.array(self.l1, dtype=np.int16)
         self.l2 = np.array(self.l2, dtype=np.int16)
-        self.base = np.ones((2*int(np.max(self.traj[:,1]))+20, 2*int(np.max(self.traj[:,0]))+20), dtype=bool)
-        self.hr, self.hc = int(self.base.shape[0]/2), int(self.base.shape[1]/2)
+        self.corners(bool if not self.sweep else np.uint8)
+    
     def animate(self, name):
-        frames = []
         trans = np.array([self.hc, self.hr], dtype=np.int16)
         for t in self.traj:
             pen = t+trans
-            self.base[pen[1]-1:pen[1]+2,pen[0]-1:pen[0]+2] = 0
+            self.ani.base[pen[1]-1:pen[1]+2,pen[0]-1:pen[0]+2] = 0
+        self.template = copy.deepcopy(self.ani.base)
         for imi in range(len(self.traj)):
-            imarr = copy.deepcopy(self.base)
+            self.ani.base_edit()
             pen = self.traj[imi]+trans
             x = self.block(1, imi)+trans
             y = self.block(2, imi)+trans
-            imarr[pen[1]-5:pen[1]+6,pen[0]-5:pen[0]+6] = 0
-            imarr[x[1]-7:x[1]+8,x[0]-7:x[0]+8] = 0
-            imarr[y[1]-7:y[1]+8,y[0]-7:y[0]+8] = 0
-
-            line_connect(imarr, pen, x, 1)
-            im = Image.fromarray(imarr)
-            frames.append(im)
-
-        frame_one = frames[0]
-        frame_one.save(f"static/{type(self).__name__}-{name}.gif", format="GIF", append_images=frames,
-            save_all=True, duration=30, loop=0)
+            if self.sweep:
+                self.ani.line_connect(pen, x, 150)
+            self.ani.base_save()
+            self.ani.canvas = np.minimum(self.ani.canvas, self.template)
+            self.ani.draw_rect(pen[1], pen[0], 5)
+            self.ani.draw_rect(x[1], x[0], 7)
+            self.ani.draw_rect(y[1], y[0], 7)
+            self.ani.line_connect(pen, x, w=1)
+            self.ani.add_frame()
+        self.ani.animate(f"{type(self).__name__}-{name}")
 
 class Biaxial(RodSlide):
     def _qcycle(self):
@@ -116,7 +69,9 @@ class Biaxial(RodSlide):
             p.append(self.position([x,0], [0,y]))
             x += self.dx
         return l1, l2, p
-        
+    def corners(self, dtype):
+        self.ani.create(2*int(np.max(self.traj[:,1]))+20, 2*int(np.max(self.traj[:,0]))+20, dtype)
+        self.hr, self.hc = int(self.ani.base.shape[0]/2), int(self.ani.base.shape[1]/2)
     def full_cycle(self):
         self.reset()
         l1, l2, qtraj = self._qcycle()
@@ -135,17 +90,20 @@ class Biaxial(RodSlide):
             self.l1 += [p[0] for p in t]
             self.l2 += [p[1] for p in t]
         super().full_cycle() 
-        self.base[self.hr, :] = 0
-        self.base[:, self.hc] = 0       
+        self.ani.base[self.hr, :] = 0
+        self.ani.base[:, self.hc] = 0       
 
 class SkewBiaxial(RodSlide):
-    def __init__(self, ang, r=100, l=200, dx=0.75) -> None:
-        super().__init__(r, l, dx)
+    def set_angle(self, ang):
         while ang < -180:
             ang += 180
         while ang > 180:
             ang -= 180
         self.angle = ang*np.pi/180
+        return self
+    def corners(self, dtype):
+        self.ani.create(2*int(np.max(self.traj[:,1]))+20, 2*int(np.max(self.traj[:,0]))+20, dtype)
+        self.hr, self.hc = int(self.ani.base.shape[0]/2), int(self.ani.base.shape[1]/2)
     def full_cycle(self):
         self.reset()
         x, l1, l2, p = 0, [[],[]], [[],[]], [[],[]]
@@ -181,19 +139,64 @@ class SkewBiaxial(RodSlide):
         self.l2 = l2[0] + l2[1]
         self.traj = p[0] + p[1]
         super().full_cycle()
-        self.base[self.hr, :] = 0
+        self.ani.base[self.hr, :] = 0
         if self.angle == np.pi/2:
-            self.base[:, self.hc] = 0  
+            self.ani.base[:, self.hc] = 0  
         else:
             slop = np.tan(self.angle)
             r = int((self.hc-10)*slop)
-            c = [10, self.base.shape[1]-10]
+            c = [10, self.ani.base.shape[1]-10]
             if self.hr - r < 0:
                 r = self.hr
                 c[0] = self.hc - self.hr/slop
                 c[1] = self.hc + self.hr/slop
+            self.ani.base_edit()
+            self.ani.line_connect([c[0],self.hr-r], [c[1], self.hr+r])
 
-            line_connect(self.base, [c[0],self.hr-r], [c[1], self.hr+r])
+class Parabola(RodSlide):
+    def set_shape(self, coef, xf, xt):
+        self.a = coef
+        self.xf, self.xt = xf, xt
+        return self
+    def corners(self, dtype):
+        cs = []
+        for axis in [0,1]:
+            for npm in (np.min, np.max):
+                cs.append(npm(np.array([npm(ps[:, axis]) for ps in [self.traj, self.l1, self.l2]])))
+        self.ani.create(cs[3]-cs[2]+20, cs[1]-cs[0]+20, dtype=dtype)
+        self.hr, self.hc = int(10-cs[2]), int(10-cs[0])
+    def full_cycle(self):
+        self.reset()
+        x1 = self.xf
+        def locate(x, t1, t2, x1):
+            return self.a*np.power(x, 4) + t1*np.power(x, 2) - 2*x1*x + t2
+        res = [[] for _ in range(4)]
+        while x1 <= self.xt:
+            y1 = self.a*x1*x1
+            t1 = 1 - 2*self.a*y1
+            t2 = x1*x1 + y1*y1 - self.r*self.r
+            xf = x1-self.r if not res[2] else res[2][-1]
+            while True:
+                try:
+                    x2 = sveqsolve(lambda x: locate(x, t1, t2, x1), 0, xf, x1+self.dx, 1)
+                except TimeoutError:
+                    if xf < x1-self.r:
+                        raise ValueError("No solution")
+                    xf -= self.dx
+                    continue
+                break
+            y2 = self.a*x2*x2
+            self.l1.append([x1,y1])
+            self.l2.append([x2,y2])
+            self.traj.append(self.position([x1,y1], [x2,y2]))
+            x1 += self.dx
+        super().full_cycle()
+        yp = None
+        for x in range(10-self.hc, self.xt+1, 1):
+            y = int(self.a * x * x)
+            if yp is not None:
+                self.ani.base[min(yp,y)+self.hr:max(yp,y)+self.hr, self.hc+x] = 0
+            yp = y
 
 def clear_animate():
     for fn in os.listdir("static"):
@@ -202,8 +205,13 @@ def clear_animate():
 
 if __name__ == "__main__":
     clear_animate()
+    ani = Animation()
     for a in range(15, 95, 15):
-        ell = SkewBiaxial(a, 75, 150)
+        ani.__init__()
+        ell = SkewBiaxial(ani).set_angle(a)
         ell.full_cycle()
         ell.animate(a)
+    # parab = Parabola(ani, dx=0.1, r=20, l=50).set_shape(1, -50, 20)
+    # parab.full_cycle()
+    # parab.animate(2)
 
