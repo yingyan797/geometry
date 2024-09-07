@@ -4,6 +4,7 @@ import copy
 class Animation:
     def __init__(self):
         self.base:np.ndarray = None
+        self.template = None
         self.canvas:np.ndarray = None
         self.frames = []
 
@@ -58,7 +59,9 @@ class Animation:
                     r += d*rat
 
     def animate(self, name):
-        print(len(self.frames))
+        print("frame length:", len(self.frames))
+        for i in range(len(self.frames)):
+            self.frames[i] = np.minimum(self.template, self.frames[i])
         frame_one = Image.fromarray(self.frames[0]) 
         frame_one.save(f"static/{name}.gif", format="GIF", append_images=map(lambda arr: Image.fromarray(arr), self.frames),
             save_all=True, duration=30, loop=0)

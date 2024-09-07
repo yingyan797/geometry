@@ -22,18 +22,12 @@ def bw(imname, opf):
 
 def sveqsolve(func, eq, xf, xt, err=0.001):
     xl, xh = xf, xt
-    fac, yf, yt = 1, 0, 0
-    while True:
-        yf, yt = func(xf), func(xt)
-        if (yf-eq)*(yt-eq) > 0:
-            xt = (xf+xt)/2
-        else:
-            break
-        if xf-xt < err:
-            raise TimeoutError("No solution or more than one")
+    yf, yt = func(xf), func(xt)
+    fac = 1
     if yf >= eq and yt <= eq:
         fac = -1
-
+    elif (yf-eq)*(yt-eq) > 0:
+        raise TimeoutError("No solution or more than one")
     while True:
         x = (xl+xh) / 2
         y = func(x)

@@ -37,26 +37,27 @@ class RodSlide:
         self.l2 = np.array(self.l2, dtype=np.int16)
         self.corners(bool if not self.sweep else np.uint8)
     
-    def animate(self, name):
+    def animate(self, name, trajw=1):
         trans = np.array([self.hc, self.hr], dtype=np.int16)
-        for t in self.traj:
-            pen = t+trans
-            self.ani.base[pen[1]-1:pen[1]+2,pen[0]-1:pen[0]+2] = 0
-        self.template = copy.deepcopy(self.ani.base)
+        if trajw >= 0:
+            for t in self.traj:
+                pen = t+trans
+                self.ani.base[pen[1]-trajw:pen[1]+trajw+1,pen[0]-trajw:pen[0]+trajw+1] = 0
+        self.ani.template = copy.deepcopy(self.ani.base)
         for imi in range(len(self.traj)):
             self.ani.base_edit()
             pen = self.traj[imi]+trans
             x = self.block(1, imi)+trans
             y = self.block(2, imi)+trans
             if self.sweep:
-                self.ani.line_connect(pen, x, 150)
+                self.ani.line_connect(pen, x, 150, 3)
             self.ani.base_save()
-            self.ani.canvas = np.minimum(self.ani.canvas, self.template)
-            self.ani.draw_rect(pen[1], pen[0], 5)
-            self.ani.draw_rect(x[1], x[0], 7)
-            self.ani.draw_rect(y[1], y[0], 7)
+            self.ani.draw_rect(pen[1], pen[0], 3)
+            self.ani.draw_rect(x[1], x[0], 5)
+            self.ani.draw_rect(y[1], y[0], 5)
             self.ani.line_connect(pen, x, w=1)
             self.ani.add_frame()
+        print("graphics")
         self.ani.animate(f"{type(self).__name__}-{name}")
 
 class Biaxial(RodSlide):
@@ -153,10 +154,11 @@ class SkewBiaxial(RodSlide):
             self.ani.base_edit()
             self.ani.line_connect([c[0],self.hr-r], [c[1], self.hr+r])
 
-class Parabola(RodSlide):
-    def set_shape(self, coef, xf, xt):
-        self.a = coef
+class FunctionCurve(RodSlide):
+    def set_shape(self, func, xf, xt, width):
+        self.func = func
         self.xf, self.xt = xf, xt
+        self.width = width
         return self
     def corners(self, dtype):
         cs = []
@@ -168,24 +170,15 @@ class Parabola(RodSlide):
     def full_cycle(self):
         self.reset()
         x1 = self.xf
-        def locate(x, t1, t2, x1):
-            return self.a*np.power(x, 4) + t1*np.power(x, 2) - 2*x1*x + t2
-        res = [[] for _ in range(4)]
+        def locate(x1, y1, ang):
+            x2 = x1 - self.r * np.sin(ang)
+            y = y1 + self.r * np.cos(ang)
+            return y - self.func(x2)
         while x1 <= self.xt:
-            y1 = self.a*x1*x1
-            t1 = 1 - 2*self.a*y1
-            t2 = x1*x1 + y1*y1 - self.r*self.r
-            xf = x1-self.r if not res[2] else res[2][-1]
-            while True:
-                try:
-                    x2 = sveqsolve(lambda x: locate(x, t1, t2, x1), 0, xf, x1+self.dx, 1)
-                except TimeoutError:
-                    if xf < x1-self.r:
-                        raise ValueError("No solution")
-                    xf -= self.dx
-                    continue
-                break
-            y2 = self.a*x2*x2
+            y1 = self.func(x1)
+            ang = sveqsolve(lambda ang: locate(x1, y1, ang), 0, 0, np.pi, 0.02)                
+            x2 = x1 - self.r * np.sin(ang)
+            y2 = y1 + self.r * np.cos(ang)
             self.l1.append([x1,y1])
             self.l2.append([x2,y2])
             self.traj.append(self.position([x1,y1], [x2,y2]))
@@ -193,9 +186,20 @@ class Parabola(RodSlide):
         super().full_cycle()
         yp = None
         for x in range(10-self.hc, self.xt+1, 1):
-            y = int(self.a * x * x)
+            y = int(self.func(x))
             if yp is not None:
-                self.ani.base[min(yp,y)+self.hr:max(yp,y)+self.hr, self.hc+x] = 0
+                yl, yh = min(yp,y), max(yp,y)
+                self.ani.base[yl+self.hr-1:yh+self.hr+1, self.hc+x] = 0 
+                if yp != y:
+                    slop = 1/(yp-y)
+                    dx = np.sqrt(np.power(self.width, 2) / (1+ np.power(slop, 2)))
+                    dy = int(slop*dx)
+                    dx = int(dx)
+                    self.ani.base[yp-dy+self.hr:yp-dy+self.hr+1, x-1-dx+self.hc:x-dx+self.hc] = 0
+                    self.ani.base[yp+dy+self.hr:yp+dy+self.hr+1, x-1+dx+self.hc:x+dx+self.hc] = 0
+                else:
+                    self.ani.base[yp+self.hr-self.width-1:yp+self.hr-self.width, self.hc+x] = 0 
+                    self.ani.base[yp+self.hr+self.width-1:yp+self.hr+self.width, self.hc+x] = 0 
             yp = y
 
 def clear_animate():
@@ -204,14 +208,23 @@ def clear_animate():
             os.remove(f"static/{fn}")
 
 if __name__ == "__main__":
-    clear_animate()
-    ani = Animation()
-    for a in range(15, 95, 15):
-        ani.__init__()
-        ell = SkewBiaxial(ani).set_angle(a)
-        ell.full_cycle()
-        ell.animate(a)
-    # parab = Parabola(ani, dx=0.1, r=20, l=50).set_shape(1, -50, 20)
-    # parab.full_cycle()
-    # parab.animate(2)
+    # clear_animate()
+    # for a in range(15, 95, 15):
+    #     ani.__init__()
+    #     ell = SkewBiaxial(ani).set_angle(a)
+    #     ell.full_cycle()
+    #     ell.animate(a)
+    def straight(r, x):
+        if abs(x) >= r/np.sqrt(2):
+            return -abs(x)+r*np.sqrt(2)
+        return np.sqrt(r*r - x*x)
+    # xs = [i for i in range(-100, 100)]
+    # ys = list(map(lambda x: straight(100, x), xs))
+    # plt.plot(xs, ys)
+    # plt.savefig("abs.png")
+    for l in range(60, 105, 20):
+        ani = Animation()
+        parab = FunctionCurve(ani, dx=1, r=50, l=l).set_shape(lambda x: straight(50, x), -120, 120, 20)
+        parab.full_cycle()
+        parab.animate(f"abs_{l}", -1)
 
