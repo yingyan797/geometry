@@ -1,0 +1,39 @@
+<head>
+    <title>Y-Geometry drawing</title>
+    <style>
+        table {
+            border-collapse: separate;
+            border-spacing: 0
+        } td {
+            border-left: 0;
+        } button {
+            border: 0;
+            padding: 8px;
+            height: 100%;
+            width: 100%
+        }
+            
+    </style>
+</head>
+<body style="background-color: azure;">
+    <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">Pixel drawing</a></h2> <form action="/drawing" method="post">
+    Setup canvas - Number of rows: <input type="number" name="nrows" step="1" min="1" max="100" value="{{site.nrows}}"> | 
+    Number of columns: <input type="number" name="ncols" step="1" min="1" max="100" value="{{site.ncols}}"> | 
+    <input type="submit" name="create" value="Create canvas >>"> <br><br>
+    <table><tr><th>All colors</th>{% for col in site.palette %} <td style="background-color: {{col[1]}};" 
+        title="Color: {{col}}">=</td> {% endfor %}</tr><tr><th>Select color</th>
+            {% for col in site.palette %} <td><button name="color_{{col[0]}}" {% if col[2] %} 
+                style="background-color: {{col[1]}}; border: 1px solid black" {% endif %} value="color">x</button></td>{% endfor %}
+        </tr></table> <br>
+    <input type="submit" name="fill" value="Fill color in the selected region">
+    {% if site.ready %}
+    <table><tr><td></td>{% for c in site.canvas[0] %} <td><button name="spancol_{{c[1]}}" value="spc"
+        style="border: 1px solid skyblue; {% if c[1] in site.spancol %}background-color: lightsalmon{% endif %}"></button>
+    </td> {% endfor %}</tr>{% for row in site.canvas %} <tr> 
+        <td><button name="spanrow_{{row[0][0]}}" value="spr" style="border: 1px solid skyblue;
+        {% if row[0][0] in site.spanrow %}background-color: lightsalmon{% endif %}"></button></td>{% for col in row %}
+        <td><button style="padding: 10px;{% if col[2] %} background-color: {{site.palette[col[2]][1]}};{% endif %}"  
+            name="pix_{{col[0]}}_{{col[1]}}" value="pen"></button> </td>
+        {% endfor %}</tr> {% endfor %}</table>
+    {% endif %}</form>
+</body>
