@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 import numpy as np
+from PIL import Image
+import os
 from database import Database
 app = Flask(__name__)
 
@@ -76,6 +78,15 @@ class Website:
         self.title = title
         site.get_history(True)
 
+    def render(self):
+        colors = [[int(f"0x{p[1][i:i+2]}", 16) for i in [0,2,4]] for p in self.palette]
+        imarr = np.array([[colors[self.canvas[r][c][2]] for c in range(self.ncols)] for r in range(self.nrows)], dtype=np.uint8)
+        scale = int(max(1, 200 / min(self.nrows, self.ncols)))
+        imarr = imarr.repeat(scale, axis=0).repeat(scale, axis=1)
+        im = Image.fromarray(imarr, mode="RGB")
+        im.save("static/canvas.png")
+        return "static/canvas.png"
+
 def canvas_decode(code, w, h):
     i = 0
     canvas = []
@@ -95,13 +106,18 @@ site.colorset(["ffffff","ff00ff","00ffff","00ff00","ff0000", "0000ff", "ffff00",
 
 @app.route("/", methods=["get", "post"])
 def index():
-    return render_template("index.html")
+    ani = []
+    for fn in os.listdir("static"):
+        if fn.endswith(".gif"):
+            ani.append("static/"+fn)
+    return render_template("index.html", ani=ani)
 
 @app.route("/drawing", methods=["get", "post"])
 def drawing():
     fm = request.form
     site.db.start()
     site.get_history()
+    pname = ""
     if fm.get("create"):
         nrows, ncols = 20, 30
         if r:=fm.get("nrows"):
@@ -147,8 +163,10 @@ def drawing():
                 if site.session == len(site.history):
                     site.session -= 1
                 site.load_num(site.session)
+        elif fm.get("render"):
+            pname = site.render()
     site.db.save()
-    return render_template("drawing.html", site=site)
+    return render_template("drawing.html", site=site, pname=pname)
 
 
 if __name__ == '__main__':

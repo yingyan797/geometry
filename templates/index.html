@@ -3,4 +3,8 @@
 </head>
 <body>
     <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">Pixel drawing</a></h2>
+    <h3 style="background-color: lightsalmon;">Keep sliding to the right for more animations >>>></h3>
+    <table><tr>
+    {% for a in ani %} <td>{{a[7:]}}<img src="{{a}}"></td>
+    {% endfor %}</tr></table>
 </body>

@@ -15,7 +15,7 @@
             
     </style>
 </head>
-<body style="background-color: azure;">
+<body style="background-color: azure;"> <div class="row">
     <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">Pixel drawing</a></h2> <form action="/drawing" method="post">
     Setup canvas - Number of rows: <input type="number" name="nrows" step="1" min="1" max="100" value="{{site.nrows}}"> | 
     Number of columns: <input type="number" name="ncols" step="1" min="1" max="100" value="{{site.ncols}}"> | 
@@ -26,7 +26,10 @@
     Session: #{{site.session}} <input type="submit" name="hdel" value="Delete">
     - Name this drawing: <input type="text" name="svname" value="{{site.title}}"> 
     <input type="submit" name="save" value="Update drawing">
-    <input type="submit" name="save" value="Save as copy"><br>
+    <input type="submit" name="save" value="Save as copy"><br></div><div class="row">
+        {% if pname %} <h3>Preview image | <input type="submit" name="" value="Back to drawing"></h3> 
+            <img src="{{pname}}" alt="Rendering">
+        {% endif %}
     <table><tr><tr><th>Select color</th>
             {% for col in site.palette %} <td><button name="color_{{col[0]}}"  
                 style="color:azure; background-color: {{col[1]}}; {% if col[2] %}border: 2px solid black 
@@ -44,5 +47,5 @@
         <td><button style="padding: 10px;{% if col[2] %} background-color: {{site.palette[col[2]][1]}};{% endif %}"  
             name="pix_{{col[0]}}_{{col[1]}}" value="pen"></button> </td>
         {% endfor %}</tr> {% endfor %}</table>
-    {% endif %}</form>
+    {% endif %}</form></div>
 </body>

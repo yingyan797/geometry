@@ -12,7 +12,6 @@ class Point:
         self.force_sum = np.zeros(2)
 
     def apply_force(self, fvec, dt):
-        print(type(self), fvec)
         acc = fvec/self.mass
         self.vel += acc*dt
 
@@ -94,7 +93,6 @@ class Universe(Field):
             for p0 in rem_parts:
                 if p != p0:
                     gf12, gf21 = gravity(p, p0)
-                    print(gf12)
                     p.force_sum += gf12
                     if not p0.static:
                         p0.force_sum += gf21
