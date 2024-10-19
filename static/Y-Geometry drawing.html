@@ -1,0 +1,776 @@
+<head>
+    <title>Y-Geometry drawing</title>
+    <style>
+        table {
+            border-collapse: separate;
+            border-spacing: 0
+        } td {
+            border-left: 0;
+        } button {
+            border: 0;
+            padding: 8px;
+            height: 100%;
+            width: 100%
+        }
+            
+    </style>
+</head>
+<body style="background-color: azure;">
+    <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">Pixel drawing</a></h2> <form action="/drawing" method="post">
+    Setup canvas - Number of rows: <input type="number" name="nrows" step="1" min="1" max="100" value="15"> | 
+    Number of columns: <input type="number" name="ncols" step="1" min="1" max="100" value="15"> | 
+    <input type="submit" name="create" value="Create canvas >>"> <br><br>
+    <table><tr><th>All colors</th> <td style="background-color: white;" 
+        title="Color: [0, &#39;white&#39;, False]">=</td>  <td style="background-color: lightblue;" 
+        title="Color: [1, &#39;lightblue&#39;, False]">=</td>  <td style="background-color: lightgreen;" 
+        title="Color: [2, &#39;lightgreen&#39;, False]">=</td>  <td style="background-color: lightsalmon;" 
+        title="Color: [3, &#39;lightsalmon&#39;, False]">=</td>  <td style="background-color: lightseagreen;" 
+        title="Color: [4, &#39;lightseagreen&#39;, False]">=</td>  <td style="background-color: cornflowerblue;" 
+        title="Color: [5, &#39;cornflowerblue&#39;, False]">=</td>  <td style="background-color: red;" 
+        title="Color: [6, &#39;red&#39;, False]">=</td>  <td style="background-color: blue;" 
+        title="Color: [7, &#39;blue&#39;, False]">=</td>  <td style="background-color: yellow;" 
+        title="Color: [8, &#39;yellow&#39;, False]">=</td>  <td style="background-color: black;" 
+        title="Color: [9, &#39;black&#39;, True]">=</td> </tr><tr><th>Select color</th>
+             <td><button name="color_0"  value="color">x</button></td> <td><button name="color_1"  value="color">x</button></td> <td><button name="color_2"  value="color">x</button></td> <td><button name="color_3"  value="color">x</button></td> <td><button name="color_4"  value="color">x</button></td> <td><button name="color_5"  value="color">x</button></td> <td><button name="color_6"  value="color">x</button></td> <td><button name="color_7"  value="color">x</button></td> <td><button name="color_8"  value="color">x</button></td> <td><button name="color_9"  
+                style="background-color: black; border: 1px solid black"  value="color">x</button></td>
+        </tr></table> <br>
+    <input type="submit" name="fill" value="Fill color in the selected region">
+    
+    <table><tr><td></td> <td><button name="spancol_0" value="spc"
+        style="border: 1px solid skyblue; background-color: lightsalmon"></button>
+    </td>  <td><button name="spancol_1" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_2" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_3" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_4" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_5" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_6" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_7" value="spc"
+        style="border: 1px solid skyblue; background-color: lightsalmon"></button>
+    </td>  <td><button name="spancol_8" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_9" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_10" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_11" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_12" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_13" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td>  <td><button name="spancol_14" value="spc"
+        style="border: 1px solid skyblue; "></button>
+    </td> </tr> <tr> 
+        <td><button name="spanrow_0" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_0_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_0_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_0_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_0_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_0_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_1" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_1_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_1_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_2" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_2_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_2_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_2_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_2_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_2_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_2_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_3" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_3_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_3_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_4" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_4_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_4_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_5" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_5_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_5_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_5_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_5_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_6" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_6_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_6_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_7" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px;"  
+            name="pix_7_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_7_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_7_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_7_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_7_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_7_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_7_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_8" value="spr" style="border: 1px solid skyblue;
+        background-color: lightsalmon"></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_8_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_8_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_9" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px;"  
+            name="pix_9_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_9_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_9_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_10" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_10_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_10_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_11" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px;"  
+            name="pix_11_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_11_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_11_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_12" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_12_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_12_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_12_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_12_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_12_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_12_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_13" value="spr" style="border: 1px solid skyblue;
+        "></button></td>
+        <td><button style="padding: 10px;"  
+            name="pix_13_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_13_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_13_14" value="pen"></button> </td>
+        </tr>  <tr> 
+        <td><button name="spanrow_14" value="spr" style="border: 1px solid skyblue;
+        background-color: lightsalmon"></button></td>
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_0" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_1" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_2" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_3" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_4" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_5" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_6" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_7" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_8" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_9" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_10" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_11" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_12" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px; background-color: black;"  
+            name="pix_14_13" value="pen"></button> </td>
+        
+        <td><button style="padding: 10px;"  
+            name="pix_14_14" value="pen"></button> </td>
+        </tr> </table>
+    </form>
+</body>

@@ -1,15 +1,18 @@
 from flask import Flask, render_template, request
 import numpy as np
+from database import Database
 app = Flask(__name__)
 
 class Website:
-    def __init__(self, palette):
-        self.palette = [[i,palette[i],False] for i in range(len(palette))]
+    def __init__(self):
         self.canvas = None
         self.ready = False
         self.color = 0
         self.spanrow = []
         self.spancol = []
+        self.db = Database()
+        self.history = []
+        self.title, self.session = "", 1
 
     def colorsel(self, num):
         for c in range(len(self.palette)):
@@ -18,11 +21,13 @@ class Website:
                 self.color = c
             else:
                 self.palette[c][2] = False
+    def colorset(self, palette):
+        self.palette = [[i,palette[i],False] for i in range(len(palette))]
 
     def create(self, nrows, ncols):
         self.nrows = nrows
         self.ncols = ncols
-        self.canvas = np.array([[[r,c,0] for c in range(ncols)] for r in range(nrows)])
+        self.canvas = np.array([[[r,c,0] for c in range(ncols)] for r in range(nrows)], dtype=np.uint8)
         self.ready = True
 
     def get_range(self):
@@ -38,10 +43,55 @@ class Website:
             else:
                 cf, ct = self.spancol[0], self.spancol[0]
         return [rf,rt,cf,ct]
+    
+    def get_history(self, update=False):
+        if not self.history or update:
+            self.history = self.db.read_all("select rowid, Title, Width, Height from History")
 
+    def load_num(self, rid):
+        title, w,h, pal, code = self.db.read_one(f"select * from History where rowid={rid}")
+        canvas = canvas_decode(code, w, h)
+        self.colorset([pal[i:i+6] for i in range(0,len(pal),6)])
+        self.create(h,w)
+        self.title = title
+        self.canvas[:,:,2] = canvas
+        self.get_history(True)
+    
+    def store(self, title, session=0):
+        code = ""
+        for row in self.canvas:
+            for col in row:
+                c = col[2]
+                if c < 9:
+                    code += str(c+1)
+                else:
+                    code += f"0{c-9}"
+        pal_code = "".join([p[1] for p in self.palette])
+        if not session:
+            self.db.do(f"insert into History (Title, Width, Height, Palette, Canvas) values (\
+                '{title}', {self.ncols}, {self.nrows}, '{pal_code}', '{code}')")
+            self.session = len(self.history)+1
+        else:
+            self.db.do(f"update History set Title='{title}',Width={self.ncols}, Height={self.nrows}, Palette='{pal_code}', Canvas='{code}' where rowid={session}")
+        self.title = title
+        site.get_history(True)
 
-site = Website(["white","lightblue","lightgreen","lightsalmon","lightseagreen",
-                "cornflowerblue","red", "blue", "yellow","black"])
+def canvas_decode(code, w, h):
+    i = 0
+    canvas = []
+    while i < len(code):
+        num = 0
+        if code[i] == '0':
+            num = 9+int(code[i+1])            
+            i += 2
+        else:
+            num = int(code[i])-1
+            i += 1
+        canvas.append(num)
+    return np.array(canvas).reshape((h,w))
+
+site = Website()
+site.colorset(["ffffff","ff00ff","00ffff","00ff00","ff0000", "0000ff", "ffff00","000000"])
 
 @app.route("/", methods=["get", "post"])
 def index():
@@ -50,7 +100,8 @@ def index():
 @app.route("/drawing", methods=["get", "post"])
 def drawing():
     fm = request.form
-    print(fm)
+    site.db.start()
+    site.get_history()
     if fm.get("create"):
         nrows, ncols = 20, 30
         if r:=fm.get("nrows"):
@@ -58,6 +109,9 @@ def drawing():
         if c:=fm.get("ncols"):
             ncols = int(c)
         site.create(nrows, ncols)
+    elif fm.get("load"):
+        site.session = int(fm.get("hid"))
+        site.load_num(site.session)
     else:
         for k, v in fm.items():
             if k.startswith("color_") and v:
@@ -83,7 +137,17 @@ def drawing():
             rg = site.get_range()
             if all(map(lambda a:a>=0, rg)):
                 site.canvas[rg[0]:rg[1]+1, rg[2]:rg[3]+1, 2] = site.color
-
+        elif sm:=fm.get("save"):
+            session = 0 if sm == "Save as copy" else site.session
+            site.store(fm.get("svname"), session)
+        elif fm.get("hdel"):
+            if site.session > 1:
+                site.db.do(f"delete from History where rowid={site.session}")
+                site.db.do(f"update History set rowid=rowid-1 where rowid>{site.session}")
+                if site.session == len(site.history):
+                    site.session -= 1
+                site.load_num(site.session)
+    site.db.save()
     return render_template("drawing.html", site=site)
 
 
