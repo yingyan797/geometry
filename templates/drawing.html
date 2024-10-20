@@ -16,17 +16,17 @@
     </style>
 </head>
 <body style="background-color: azure;"> <div class="row">
-    <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">Pixel drawing</a></h2> <form action="/drawing" method="post">
-    Setup canvas - Number of rows: <input type="number" name="nrows" step="1" min="1" max="100" value="{{site.nrows}}"> | 
+    <h2><a href="/">Y-Geometry Home</a> | <a href="/drawing">[Pixel drawing]</a></h2> <form action="/drawing" method="post">
+    <b>Setup canvas</b> - Number of rows: <input type="number" name="nrows" step="1" min="1" max="100" value="{{site.nrows}}"> | 
     Number of columns: <input type="number" name="ncols" step="1" min="1" max="100" value="{{site.ncols}}"> | 
-    <input type="submit" name="create" value="Create canvas >>"> <br>
-    Load draft from history: <select name="hid">{% for i, title, w, h in site.history %}
+    <input type="submit" name="create" value="Create or reset canvas >>"> <br>
+    Or, load draft canvas from history: <select name="hid">{% for i, title, w, h in site.history %}
         <option value="{{i}}">#{{i}}: {{title}} ({{h}}x{{w}}) </option>{% endfor %}
-    </select><input type="submit" name="load" value="Load >>"> <br>
-    Session: #{{site.session}} <input type="submit" name="hdel" value="Delete">
+    </select><input type="submit" name="load" value="Load >>"> <span style="background-color: lightgreen;">[{{msg}}]</span>  <br>
+    <h3> Session: #{{site.session}} <input type="submit" name="hdel" value="Delete">
     - Name this drawing: <input type="text" name="svname" value="{{site.title}}"> 
     <input type="submit" name="save" value="Update drawing">
-    <input type="submit" name="save" value="Save as copy"><br></div><div class="row">
+    <input type="submit" name="save" value="Save as copy"></h3></div><div class="row">
         {% if pname %} <h3>Preview image | <input type="submit" name="" value="Back to drawing"></h3> 
             <img src="{{pname}}" alt="Rendering">
         {% endif %}
@@ -37,7 +37,8 @@
             </button></td>{% endfor %}
         </tr></table>
     <input type="submit" name="fill" value="Fill color in the region"> | 
-    <input type="submit" name="render" value="Render drawing as image">
+    <input type="submit" name="render" value="Render drawing as image"> | 
+    <input type="submit" name="undo" value="< Undo action" disabled><input type="submit" name="undo" value="Redo >" disabled>
     {% if site.ready %}
     <table><tr><td></td>{% for c in site.canvas[0] %} <td><button name="spancol_{{c[1]}}" value="spc"
         style="border: 1px solid skyblue; {% if c[1] in site.spancol %}background-color: lightsalmon{% endif %}"></button>

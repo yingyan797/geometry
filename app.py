@@ -117,7 +117,7 @@ def drawing():
     fm = request.form
     site.db.start()
     site.get_history()
-    pname = ""
+    pname, msg = "", ""
     if fm.get("create"):
         nrows, ncols = 20, 30
         if r:=fm.get("nrows"):
@@ -128,6 +128,7 @@ def drawing():
     elif fm.get("load"):
         site.session = int(fm.get("hid"))
         site.load_num(site.session)
+        msg = f"Loaded successfully - Session #{site.session}"
     else:
         for k, v in fm.items():
             if k.startswith("color_") and v:
@@ -166,7 +167,7 @@ def drawing():
         elif fm.get("render"):
             pname = site.render()
     site.db.save()
-    return render_template("drawing.html", site=site, pname=pname)
+    return render_template("drawing.html", site=site, pname=pname, msg=msg)
 
 
 if __name__ == '__main__':
