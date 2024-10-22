@@ -36,13 +36,14 @@
                 {% else %}border: 1px dashed black {% endif %}" value="color">{% if col[2] %}x{% endif %}
             </button></td>{% endfor %}
         </tr></table>
+    {% if canvas != "" %}
     <input type="submit" name="fill" value="Fill color in the region"> | 
     <input type="submit" name="render" value="Render drawing as image"> | 
-    <input type="submit" name="undo" value="< Undo action" disabled><input type="submit" name="undo" value="Redo >" disabled>
-    {% if site.ready %}
-    <table><tr><td></td>{% for c in site.canvas[0] %} <td><button name="spancol_{{c[1]}}" value="spc"
+    <input type="submit" name="undo" value="< Undo action" {% if site.first_state() %} disabled {% endif %}>
+    <input type="submit" name="redo" value="Redo >" {% if not site.canvas[1] %} disabled {% endif %}>
+    <table><tr><td></td>{% for c in canvas[0] %} <td><button name="spancol_{{c[1]}}" value="spc"
         style="border: 1px solid skyblue; {% if c[1] in site.spancol %}background-color: lightsalmon{% endif %}"></button>
-    </td> {% endfor %}</tr>{% for row in site.canvas %} <tr> 
+    </td> {% endfor %}</tr>{% for row in canvas %} <tr> 
         <td><button name="spanrow_{{row[0][0]}}" value="spr" style="border: 1px solid skyblue;
         {% if row[0][0] in site.spanrow %}background-color: lightsalmon{% endif %}"></button></td>{% for col in row %}
         <td><button style="padding: 10px;{% if col[2] %} background-color: {{site.palette[col[2]][1]}};{% endif %}"  

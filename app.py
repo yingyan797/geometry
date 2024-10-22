@@ -1,14 +1,13 @@
 from flask import Flask, render_template, request
 import numpy as np
 from PIL import Image
-import os
+import os, copy
 from database import Database
 app = Flask(__name__)
 
 class Website:
     def __init__(self):
         self.canvas = None
-        self.ready = False
         self.color = 0
         self.spanrow = []
         self.spancol = []
@@ -29,8 +28,12 @@ class Website:
     def create(self, nrows, ncols):
         self.nrows = nrows
         self.ncols = ncols
-        self.canvas = np.array([[[r,c,0] for c in range(ncols)] for r in range(nrows)], dtype=np.uint8)
-        self.ready = True
+        if self.canvas:
+            while self.canvas[1]:
+                self.canvas[0].append(self.canvas[1].pop(0))
+        else:
+            self.canvas = ([],[])
+        self.canvas[0].append(np.array([[[r,c,0] for c in range(ncols)] for r in range(nrows)], dtype=np.uint8))
 
     def get_range(self):
         rf, rt, cf, ct = -1,-1,-1,-1
@@ -52,11 +55,13 @@ class Website:
 
     def load_num(self, rid):
         title, w,h, pal, code = self.db.read_one(f"select * from History where rowid={rid}")
-        canvas = canvas_decode(code, w, h)
+        cmap = canvas_decode(code, w, h)
         self.colorset([pal[i:i+6] for i in range(0,len(pal),6)])
         self.create(h,w)
         self.title = title
-        self.canvas[:,:,2] = canvas
+        canvas = self.canvas[0].pop()
+        canvas[:,:,2] = cmap
+        self.canvas[0].append(canvas)
         self.get_history(True)
     
     def store(self, title, session=0):
@@ -86,6 +91,27 @@ class Website:
         im = Image.fromarray(imarr, mode="RGB")
         im.save("static/canvas.png")
         return "static/canvas.png"
+    def apply_pixel(self, coord):
+        canvas = copy.deepcopy(self.canvas[0][-1])
+        canvas[coord[0]][coord[1]][2] = site.color
+        self.canvas[0].append(canvas)
+    def fill_color(self):
+        rg = site.get_range()
+        if all(map(lambda a:a>=0, rg)):
+            canvas = copy.deepcopy(self.canvas[0][-1])
+            canvas[rg[0]:rg[1]+1, rg[2]:rg[3]+1, 2] = site.color
+            self.canvas[0].append(canvas)
+    def first_state(self):
+        return len(self.canvas[0]) < 2
+    def _get_shape(self):
+        csp = self.canvas[0][-1].shape
+        self.nrows, self.ncols = csp[0], csp[1]
+    def undo(self):
+        self.canvas[1].insert(0,self.canvas[0].pop())
+        self._get_shape()
+    def redo(self):
+        self.canvas[0].append(self.canvas[1].pop(0))
+        self._get_shape()
 
 def canvas_decode(code, w, h):
     i = 0
@@ -129,6 +155,10 @@ def drawing():
         site.session = int(fm.get("hid"))
         site.load_num(site.session)
         msg = f"Loaded successfully - Session #{site.session}"
+    elif fm.get("undo"):
+        site.undo()
+    elif fm.get("redo"):
+        site.redo()
     else:
         for k, v in fm.items():
             if k.startswith("color_") and v:
@@ -136,7 +166,7 @@ def drawing():
                 break
             if k.startswith("pix_"):
                 coord = [int(seg) for seg in k[4:].split("_")]
-                site.canvas[coord[0]][coord[1]][2] = site.color
+                site.apply_pixel(coord)
                 break
             if k.startswith("spanrow_"):
                 spr = int(k[8:])
@@ -151,9 +181,7 @@ def drawing():
                 site.spancol.append(spc)
                 break
         if fm.get("fill"):
-            rg = site.get_range()
-            if all(map(lambda a:a>=0, rg)):
-                site.canvas[rg[0]:rg[1]+1, rg[2]:rg[3]+1, 2] = site.color
+            site.fill_color()
         elif sm:=fm.get("save"):
             session = 0 if sm == "Save as copy" else site.session
             site.store(fm.get("svname"), session)
@@ -167,7 +195,9 @@ def drawing():
         elif fm.get("render"):
             pname = site.render()
     site.db.save()
-    return render_template("drawing.html", site=site, pname=pname, msg=msg)
+    # if site.canvas:
+    #     print(len(site.canvas[0]), len(site.canvas[1]))
+    return render_template("drawing.html", site=site, canvas=site.canvas[0][-1] if site.canvas else "", pname=pname, msg=msg)
 
 
 if __name__ == '__main__':
