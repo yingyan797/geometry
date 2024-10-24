@@ -7,7 +7,7 @@ The application has 2 main parts:
 
 ## System setup
 1. Python Flask, numpy, matplotlib, and PIL are required
-2. [Pixel drawing] Clone code, run app.py, and open browser at localhost:5002 to view both applications
+2. [Pixel drawing] Clone code, run app.py, and open browser at localhost:5007 to view both applications
 3. [Geometric animation] Edit the main function of trajectory.py to generate GIF animations 
 4. [Physics simulation] Edit the main function of universe.py to create trajectory of point masses
 

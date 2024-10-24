@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 class Website:
     def __init__(self):
-        self.canvas = None
+        self.canvas, self.ncache = None, 20
         self.color = 0
         self.spanrow = []
         self.spancol = []
@@ -24,6 +24,7 @@ class Website:
                 self.palette[c][2] = False
     def colorset(self, palette):
         self.palette = [[i,palette[i],False] for i in range(len(palette))]
+        site.color = self.palette[-1][1]
 
     def create(self, nrows, ncols):
         self.nrows = nrows
@@ -94,13 +95,20 @@ class Website:
     def apply_pixel(self, coord):
         canvas = copy.deepcopy(self.canvas[0][-1])
         canvas[coord[0]][coord[1]][2] = site.color
-        self.canvas[0].append(canvas)
+        self._caching(canvas)
     def fill_color(self):
         rg = site.get_range()
         if all(map(lambda a:a>=0, rg)):
             canvas = copy.deepcopy(self.canvas[0][-1])
             canvas[rg[0]:rg[1]+1, rg[2]:rg[3]+1, 2] = site.color
-            self.canvas[0].append(canvas)
+            self._caching(canvas)
+    def _caching(self, canvas):
+        self.canvas[0].append(canvas)
+        self.canvas[1].clear()
+        if len(self.canvas[0]) > self.ncache:
+            self.canvas[0].pop(0)
+        self.caches = (len(self.canvas[0]), len(self.canvas[1]))
+
     def first_state(self):
         return len(self.canvas[0]) < 2
     def _get_shape(self):
@@ -201,4 +209,4 @@ def drawing():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002, debug=True)
+    app.run(host='0.0.0.0', port=5007, debug=True)
